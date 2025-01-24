@@ -23,17 +23,20 @@ from assets import PRICING
 def set_chromedriver_permissions():
     """Set appropriate permissions for ChromeDriver based on OS"""
     if platform.system() == "Windows":
-        driver_path = "chromedriver-win64/chromedriver.exe"
+        driver_path = ChromeDriverManager().install()
     else:
-        driver_path = "chromedriver-linux64/chromedriver"
+        # For Linux deployment
+        os.system('apt-get update && apt-get install -y chromium-browser')
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.binary_location = "/usr/bin/chromium-browser"
+        driver_path = "/usr/bin/chromedriver"
         
     try:
-        # Set executable permissions (755 for Linux, full control for Windows)
-        if platform.system() == "Windows":
-            os.chmod(driver_path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
-        else:
+        if platform.system() != "Windows":
             os.chmod(driver_path, 0o755)
-            
         return driver_path
     except Exception as e:
         st.error(f"❌ Failed to set ChromeDriver permissions: {str(e)}")
@@ -42,18 +45,19 @@ def set_chromedriver_permissions():
 def fetch_html_selenium(url):
     """Fetch HTML content using Selenium with proper error handling"""
     try:
-        driver_path = set_chromedriver_permissions()
-        if not driver_path:
-            raise Exception("Failed to configure ChromeDriver")
-            
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         
-        service = Service(driver_path)
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        if platform.system() == "Windows":
+            service = Service(ChromeDriverManager().install())
+        else:
+            # For Linux deployment
+            chrome_options.binary_location = "/usr/bin/chromium-browser"
+            service = Service("/usr/bin/chromedriver")
         
+        driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.get(url)
         html = driver.page_source
         driver.quit()
