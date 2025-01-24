@@ -126,12 +126,9 @@ st.markdown("""
         border-radius: 4px !important;
     }
     
-    /* Footer styling */
+    /* Updated footer styling */
     .footer {
-        position: fixed;
-        bottom: 20px;
-        left: 0;
-        right: 0;
+        width: 100%;
         padding: 20px;
         text-align: center;
         color: #6b4e94;
@@ -163,12 +160,17 @@ with left_col:
         maxtags=-1,
         key='tags_input'
     )
-    st.caption("Enter each field you want to extract and press enter")
+    st.caption("NOTE: Use only Gemini 1.5 Flash for now")
 
 with right_col:
     st.markdown("### 📊 Results")
     
     if st.button("Start Scraping"):
+        # Validate inputs before proceeding
+        if not tags:
+            st.error("⚠️ Please add at least one field to extract")
+            st.stop()  # Use st.stop() instead of return
+            
         with st.spinner('🌟 Magic in progress...'):
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             try:
@@ -176,14 +178,38 @@ with right_col:
                 markdown = html_to_markdown_with_readability(raw_html)
                 save_raw_data(markdown, timestamp)
                 
-                DynamicListingModel = create_dynamic_listing_model(tags)
-                DynamicListingsContainer = create_listings_container_model(DynamicListingModel)
+                try:
+                    DynamicListingModel = create_dynamic_listing_model(tags)
+                    DynamicListingsContainer = create_listings_container_model(DynamicListingModel)
+                    formatted_data, tokens_count = format_data(markdown, DynamicListingsContainer, DynamicListingModel, model_selection)
                 
-                formatted_data, tokens_count = format_data(markdown, DynamicListingsContainer, DynamicListingModel, model_selection)
+                except ValueError as schema_error:
+                    st.error(f"""
+                    ❌ Schema validation error:
+                    - Make sure field names are valid (no special characters)
+                    - Each field should have a clear data type
+                    - Field names should be unique
+                    
+                    Technical details: {str(schema_error)}
+                    """)
+                    st.stop()
+                    
+                except Exception as e:
+                    if "400" in str(e) or "CountTokensRequest" in str(e):
+                        st.error(f"""
+                        ❌ Model schema error:
+                        - Try reducing the number of fields to extract
+                        - Make field names shorter and simpler
+                        - Verify the data structure is valid
+                        
+                        Technical details: {str(e)}
+                        """)
+                        st.stop()
+                    raise e  # Re-raise other exceptions
+                
+                # Continue with success path
                 input_tokens, output_tokens, total_cost = calculate_price(tokens_count, model=model_selection)
-                
                 df = save_formatted_data(formatted_data, timestamp)
-                
                 st.success("✨ Scraping completed successfully!")
                 st.dataframe(df, use_container_width=True)
                 
@@ -215,7 +241,14 @@ with right_col:
                     )
                     
             except Exception as e:
-                st.error(f"❌ An error occurred: {str(e)}")
+                st.error(f"""
+                ❌ An error occurred:
+                - Check your internet connection
+                - Verify the URL is accessible
+                - Try again in a few minutes
+                
+                Technical details: {str(e)}
+                """)
 
 st.markdown(
     "<div class='footer'>"

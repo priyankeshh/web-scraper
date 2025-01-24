@@ -63,11 +63,12 @@ streamlit run streamlit_app.py
 
 ### 3. Scraping Results
 <!-- Insert screenshot of the scraped data in the app -->
-*Screenshot showing the successfully scraped data in the application*
+![image](https://github.com/user-attachments/assets/511460f8-31d6-4b0b-a9a1-30ab418080f9)
 
 ### 4. Exported Data
 <!-- Insert screenshot of the exported CSV file -->
-*Screenshot showing the final structured data in CSV format*
+![image](https://github.com/user-attachments/assets/638d466b-ac71-4298-be5a-6f116944f2b9)
+
 
 Example of scraping train schedule information:
 ```json
