@@ -1,12 +1,20 @@
 import streamlit as st
 import os
 import subprocess
-from scraper import fetch_html  # Use the new universal fetch function
+from scraper import (
+    fetch_html,
+    save_raw_data, 
+    format_data,
+    save_formatted_data,
+    calculate_price,
+    html_to_markdown_with_readability,
+    create_dynamic_listing_model, 
+    create_listings_container_model
+)
 from streamlit_tags import st_tags
 import pandas as pd
 import json
 from datetime import datetime
-from scraper import save_raw_data, format_data, save_formatted_data, calculate_price, html_to_markdown_with_readability, create_dynamic_listing_model, create_listings_container_model
 from assets import PRICING
 
 # Install Playwright browsers on first run

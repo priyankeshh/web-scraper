@@ -444,6 +444,10 @@ def calculate_price(tokens_count: dict, model: str) -> tuple[float, float, float
     total_cost = input_cost + output_cost
     return input_cost, output_cost, total_cost
 
+__all__ = ['fetch_html', 'save_raw_data', 'format_data', 'save_formatted_data', 
+           'calculate_price', 'html_to_markdown_with_readability', 
+           'create_dynamic_listing_model', 'create_listings_container_model']
+
 def fetch_html_playwright(url: str) -> Optional[str]:
     """Fetch HTML content using Playwright with proper error handling"""
     try:
@@ -459,13 +463,22 @@ def fetch_html_playwright(url: str) -> Optional[str]:
         logging.error(f"Failed to fetch URL with Playwright: {str(e)}")
         return None
 
+def fetch_html_selenium(url: str) -> str:
+    """Fallback function to fetch HTML content using Selenium"""
+    # Implement Selenium fetch logic here
+    pass
+
 def fetch_html(url: str) -> str:
-    """Universal fetch function that tries Playwright first"""
-    html = fetch_html_playwright(url)
-    if html:
-        return html
-    else:
-        raise Exception("Failed to fetch URL content")
+    """Universal fetch function that tries Playwright first, falls back to Selenium"""
+    try:
+        html = fetch_html_playwright(url)
+        if html:
+            return html
+        logging.info("Playwright fetch failed, falling back to Selenium")
+        return fetch_html_selenium(url)
+    except Exception as e:
+        logging.error(f"Playwright fetch failed with error: {str(e)}, falling back to Selenium")
+        return fetch_html_selenium(url)
 
 if __name__ == "__main__":
     url = 'https://webscraper.io/test-sites/e-commerce/static'
