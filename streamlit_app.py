@@ -1,17 +1,7 @@
 import streamlit as st
 import os
-import platform
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.common.exceptions import WebDriverException
-
-st.set_page_config(
-    page_title="Web Scraper",
-    page_icon="logo.svg",
-    layout="wide"
-)
-
+import subprocess
+from scraper import fetch_html  # Use the new universal fetch function
 from streamlit_tags import st_tags
 import pandas as pd
 import json
@@ -19,57 +9,15 @@ from datetime import datetime
 from scraper import save_raw_data, format_data, save_formatted_data, calculate_price, html_to_markdown_with_readability, create_dynamic_listing_model, create_listings_container_model
 from assets import PRICING
 
-def setup_chrome_driver():
-    """Setup ChromeDriver with proper error handling for both local and cloud environments"""
-    try:
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        
-        if platform.system() == "Windows":
-            # For local Windows environment
-            try:
-                service = Service(ChromeDriverManager(version="114.0.5735.90").install())
-            except:
-                # Fallback to local ChromeDriver
-                service = Service("chromedriver-win64/chromedriver.exe")
-        else:
-            # For Streamlit cloud (Linux)
-            try:
-                os.system('apt-get update && apt-get install -y chromium-browser chromium-chromedriver')
-                chrome_options.binary_location = "/usr/bin/chromium-browser"
-                service = Service("/usr/lib/chromium/chromedriver")
-            except:
-                # Fallback to webdriver-manager
-                service = Service(ChromeDriverManager().install())
-        
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-        return driver
-    except Exception as e:
-        st.error(f"❌ ChromeDriver setup error: {str(e)}")
-        return None
+# Install Playwright browsers on first run
+if not os.path.exists("/home/appuser/.cache/ms-playwright"):
+    subprocess.run(["playwright", "install", "chromium"], check=True)
 
-def fetch_html_selenium(url):
-    """Fetch HTML content using Selenium with proper error handling"""
-    driver = None
-    try:
-        driver = setup_chrome_driver()
-        if not driver:
-            raise Exception("Failed to initialize ChromeDriver")
-            
-        driver.get(url)
-        html = driver.page_source
-        return html
-    except Exception as e:
-        st.error(f"❌ Failed to fetch URL: {str(e)}")
-        raise Exception(f"Failed to fetch URL: {str(e)}")
-    finally:
-        if driver:
-            try:
-                driver.quit()
-            except:
-                pass
+st.set_page_config(
+    page_title="Web Scraper",
+    page_icon="logo.svg",
+    layout="wide"
+)
 
 st.markdown("""
     <style>
@@ -216,7 +164,7 @@ with right_col:
         with st.spinner('🌟 Magic in progress...'):
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             try:
-                raw_html = fetch_html_selenium(url_input)
+                raw_html = fetch_html(url_input)
                 markdown = html_to_markdown_with_readability(raw_html)
                 save_raw_data(markdown, timestamp)
                 

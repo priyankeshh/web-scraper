@@ -4,7 +4,7 @@ import time
 import re
 import json
 from datetime import datetime
-from typing import List, Dict, Type
+from typing import List, Dict, Type, Optional
 from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache
 import logging
@@ -444,13 +444,36 @@ def calculate_price(tokens_count: dict, model: str) -> tuple[float, float, float
     total_cost = input_cost + output_cost
     return input_cost, output_cost, total_cost
 
+def fetch_html_playwright(url: str) -> Optional[str]:
+    """Fetch HTML content using Playwright with proper error handling"""
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            context = browser.new_context()
+            page = context.new_page()
+            page.goto(url, wait_until="networkidle")
+            html = page.content()
+            browser.close()
+            return html
+    except Exception as e:
+        logging.error(f"Failed to fetch URL with Playwright: {str(e)}")
+        return None
+
+def fetch_html(url: str) -> str:
+    """Universal fetch function that tries Playwright first"""
+    html = fetch_html_playwright(url)
+    if html:
+        return html
+    else:
+        raise Exception("Failed to fetch URL content")
+
 if __name__ == "__main__":
     url = 'https://webscraper.io/test-sites/e-commerce/static'
     fields=['Name of item', 'Price']
 
     try:
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        raw_html = fetch_html_selenium(url)
+        raw_html = fetch_html(url)
         markdown = html_to_markdown_with_readability(raw_html)
         save_raw_data(markdown, timestamp)
         DynamicListingModel = create_dynamic_listing_model(fields)
