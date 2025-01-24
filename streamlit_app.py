@@ -141,7 +141,7 @@ col1, col2 = st.columns([1, 4])
 with col1:
     st.image("logo.svg", width=100)
 with col2:
-    st.markdown("<h1 style='text-align: left;'>Universal Web Scraper</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: left;'>Web Scraper</h1>", unsafe_allow_html=True)
     st.markdown("<p style='color: #6b4e94; font-size: 1.2em;'>Scrape data beautifully</p>", unsafe_allow_html=True)
 
 left_col, right_col = st.columns([1, 1])

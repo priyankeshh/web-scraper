@@ -1,37 +1,35 @@
-# 🌐 Web Scraper with Streamlit Interface
+# 🌐 Web Scraper
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Chrome](https://img.shields.io/badge/Chrome-132+-green.svg)](https://www.google.com/chrome/)
 
-A comprehensive web scraping tool that extracts data from websites and provides a user-friendly interface for visualization.
+An advanced web scraping solution that combines the power of AI with automated data extraction. Built with a modern tech stack and featuring an intuitive Streamlit interface, this tool transforms complex web data into structured, analysis-ready formats.
 
-## Project Description
+## 🌟 Key Features
 
-This project is a web scraper that extracts data from websites. It uses Selenium to automate browser interactions, Pandas for data manipulation, and Streamlit for creating an interactive web application to visualize the scraped data. The scraped data is saved in markdown, json, and excel formats.
+- 🤖 **AI-Powered Data Extraction** - Utilizes multiple LLM models for intelligent data parsing
+- 🎯 **Custom Field Selection** - Define exactly what data you want to extract
+- 📊 **Multi-Format Export** - Export to JSON, Excel, and Markdown
+- ⚡ **Real-Time Processing** - Watch the scraping process in action
+- 🎨 **Modern UI/UX** - Clean, responsive interface built with Streamlit
+- 🔄 **Progress Tracking** - Live updates on scraping status
 
-## ✨ Features
-
-- 🤖 Automated web scraping using Selenium
-- 📊 Interactive data visualization with Streamlit
-- 💾 Multiple export formats (JSON, Excel, Markdown)
-- 🔄 Real-time progress tracking
-- 🎯 Customizable scraping parameters
-- 📱 Responsive web interface
-
-## 🚀 Quick Start
+## 🚀 Getting Started
 
 ### Prerequisites
-- Python 3.11 or higher
-- Chrome browser version 132 or higher
+
+- Python 3.11+
+- Google Chrome 132+
 - pip (Python package manager)
 
-### Installation
+### Quick Install
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/priyankeshh/web-scraper.git
-cd web-scraper
+git clone https://github.com/yourusername/intelligent-web-scraper.git
+cd intelligent-web-scraper
 ```
 
 2. Install dependencies:
@@ -39,38 +37,26 @@ cd web-scraper
 pip install -r requirements.txt
 ```
 
-## 💻 Usage
-
-1. Start the application:
+3. Launch the application:
 ```bash
 streamlit run streamlit_app.py
 ```
 
-2. Enter the target URL in the web interface
-3. Configure scraping parameters
-4. Click 'Start Scraping' to begin
+## 📸 Usage Example
 
-## 📸 Example Usage
+### 1. Select Target Website
+![Target Website Selection](https://github.com/user-attachments/assets/8a94ce17-6ffc-4da1-9ce2-c43cbab3968c)
 
-### 1. Target Website
-<!-- Insert screenshot of the target website here -->
-![image](https://github.com/user-attachments/assets/8a94ce17-6ffc-4da1-9ce2-c43cbab3968c)
+### 2. Configure Scraping Parameters
+![Scraper Configuration](https://github.com/user-attachments/assets/748fa4a1-cb2e-486f-944a-798f0c534dfd)
 
-### 2. Configuration
-<!-- Insert screenshot of the scraper interface with configuration -->
-![image](https://github.com/user-attachments/assets/748fa4a1-cb2e-486f-944a-798f0c534dfd)
+### 3. View Results
+![Scraping Results](https://github.com/user-attachments/assets/511460f8-31d6-4b0b-a9a1-30ab418080f9)
 
+### 4. Access Exported Data
+![Exported Data](https://github.com/user-attachments/assets/638d466b-ac71-4298-be5a-6f116944f2b9)
 
-### 3. Scraping Results
-<!-- Insert screenshot of the scraped data in the app -->
-![image](https://github.com/user-attachments/assets/511460f8-31d6-4b0b-a9a1-30ab418080f9)
-
-### 4. Exported Data
-<!-- Insert screenshot of the exported CSV file -->
-![image](https://github.com/user-attachments/assets/638d466b-ac71-4298-be5a-6f116944f2b9)
-
-
-Example of scraping train schedule information:
+Example output format:
 ```json
 {
   "listings": [
@@ -85,48 +71,53 @@ Example of scraping train schedule information:
 }
 ```
 
-This section demonstrates the complete workflow from selecting a target website to obtaining structured, usable data.
-
-## 🛠️ Technical Stack
+## 🛠️ Technology Stack
 
 - **Web Automation**: Selenium WebDriver
-- **Data Processing**: Pandas
-- **User Interface**: Streamlit
-- **Data Export**: OpenPyXL, JSON
+- **AI Models**: OpenAI GPT-4, Google Gemini, Llama
+- **Frontend**: Streamlit
+- **Data Processing**: Pandas, BeautifulSoup4
+- **Export Formats**: JSON, Excel, Markdown
 - **Browser Driver**: ChromeDriver
 
 ## 📁 Project Structure
 
 ```
-web-scraper/
-│
-├── streamlit_app.py    # Main Streamlit interface
-├── scraper.py         # Core scraping logic
-├── assets.py         # Utility functions
-├── requirements.txt  # Project dependencies
-├── output/          # Scraped data storage
-└── chromedriver-win64/ # Chrome WebDriver
+intelligent-web-scraper/
+├── streamlit_app.py     # Main application interface
+├── scraper.py          # Core scraping engine
+├── assets.py          # Utility functions and constants
+├── requirements.txt   # Project dependencies
+├── output/           # Exported data directory
+└── chromedriver/    # Chrome WebDriver files
 ```
 
 ## 🤝 Contributing
 
+We welcome contributions! Here's how you can help:
+
 1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## 📝 License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👤 Author
+## 👥 Support
 
-Made with ❤️ by Priyankesh
-- GitHub: [@priyankeshh](https://github.com/priyankeshh)
+If you encounter any issues or have questions:
+- Open an issue in the GitHub repository
+- Contact the maintainer at your.email@example.com
 
 ## 🙏 Acknowledgments
 
-- Selenium Documentation
+- Selenium Documentation Team
 - Streamlit Community
-- ChromeDriver team
+- ChromeDriver Development Team
+- All our contributors and users
+
+
+Made by Priyankesh
