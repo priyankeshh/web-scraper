@@ -1,4 +1,11 @@
 import streamlit as st
+import os
+import stat
+import platform
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.common.exceptions import WebDriverException
 
 st.set_page_config(
     page_title="Web Scraper",
@@ -10,8 +17,72 @@ from streamlit_tags import st_tags
 import pandas as pd
 import json
 from datetime import datetime
-from scraper import fetch_html_selenium, save_raw_data, format_data, save_formatted_data, calculate_price, html_to_markdown_with_readability, create_dynamic_listing_model, create_listings_container_model
+from scraper import save_raw_data, format_data, save_formatted_data, calculate_price, html_to_markdown_with_readability, create_dynamic_listing_model, create_listings_container_model
 from assets import PRICING
+
+def set_chromedriver_permissions():
+    """Set appropriate permissions for ChromeDriver"""
+    driver_path = "chromedriver-win64/chromedriver.exe"
+    try:
+        if platform.system() == "Windows":
+            # Full control permissions on Windows
+            os.chmod(driver_path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+        else:
+            # 755 permissions on Unix-like systems
+            os.chmod(driver_path, 0o755)
+        return True
+    except Exception as e:
+        st.error(f"Failed to set ChromeDriver permissions: {str(e)}")
+        return False
+
+def fetch_html_selenium(url):
+    """Fetch HTML content using Selenium with proper error handling"""
+    try:
+        # Setup Chrome options
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        
+        # Try multiple methods to initialize ChromeDriver
+        try:
+            # First attempt: Use local ChromeDriver with permissions fix
+            if not set_chromedriver_permissions():
+                raise Exception("Failed to set ChromeDriver permissions")
+            
+            service = Service('chromedriver-win64/chromedriver.exe')
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+            
+        except WebDriverException:
+            # Second attempt: Use webdriver_manager
+            st.warning("⚠️ Falling back to webdriver_manager...")
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+
+        # Fetch page content
+        driver.get(url)
+        html = driver.page_source
+        driver.quit()
+        return html
+
+    except Exception as e:
+        st.error(f"❌ Failed to fetch URL: {str(e)}")
+        raise Exception(f"Failed to fetch URL: {str(e)}")
+
+    finally:
+        try:
+            driver.quit()
+        except:
+            pass
+
+# Add this at the start of your Streamlit app
+try:
+    if set_chromedriver_permissions():
+        st.success("✅ ChromeDriver permissions set successfully")
+    else:
+        st.warning("⚠️ Using alternative ChromeDriver initialization method")
+except Exception as e:
+    st.error(f"❌ ChromeDriver setup error: {str(e)}")
 
 st.markdown("""
     <style>
