@@ -54,11 +54,12 @@ streamlit run streamlit_app.py
 
 ### 1. Target Website
 <!-- Insert screenshot of the target website here -->
-*Screenshot of the website we want to scrape data from*
+![image](https://github.com/user-attachments/assets/8a94ce17-6ffc-4da1-9ce2-c43cbab3968c)
 
 ### 2. Configuration
 <!-- Insert screenshot of the scraper interface with configuration -->
-*Screenshot showing how to configure the scraper with your desired fields*
+![image](https://github.com/user-attachments/assets/748fa4a1-cb2e-486f-944a-798f0c534dfd)
+
 
 ### 3. Scraping Results
 <!-- Insert screenshot of the scraped data in the app -->

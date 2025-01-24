@@ -23,7 +23,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 
 from openai import OpenAI
 import google.generativeai as genai
@@ -32,6 +31,8 @@ from groq import Groq
 import httpx
 from urllib3.util.retry import Retry
 from tenacity import retry, stop_after_attempt, wait_exponential
+
+from webdriver_manager.chrome import ChromeDriverManager
 
 # Import all necessary constants first
 from assets import (
@@ -112,6 +113,33 @@ def fetch_html_selenium(url: str) -> str:
             delay = min(base_delay * (exponential_base ** attempt), RETRY_SETTINGS["max_delay"])
             time.sleep(delay)
 
+def setup_selenium():
+    options = Options()
+    user_agent = random.choice(USER_AGENTS)
+    options.add_argument(f"user-agent={user_agent}")
+    
+    # Add headless options for cloud deployment
+    options.add_argument("--headless")  # Run in headless mode
+    options.add_argument("--no-sandbox")  # Bypass OS security model
+    options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
+    
+    try:
+        # Try using webdriver_manager first
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=options)
+    except Exception as e:
+        logger.warning(f"Failed to use webdriver_manager: {e}")
+        try:
+            # Fallback to local ChromeDriver
+            service = Service("chromedriver-win64/chromedriver.exe")
+            driver = webdriver.Chrome(service=service, options=options)
+        except Exception as e:
+            logger.error(f"Failed to start ChromeDriver: {e}")
+            raise
+    
+    driver.set_page_load_timeout(Config.SELENIUM_TIMEOUT)
+    return driver
+
 def batch_scrape(urls: List[str], max_workers: int = MAX_WORKERS) -> List[str]:
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         results = list(executor.map(fetch_html_selenium, urls))
@@ -132,21 +160,6 @@ def validate_content(html_content: str) -> str:
     if not html_content or len(html_content) < 100:
         raise ValueError("Invalid or empty content received")
     return html_content
-
-def setup_selenium():
-    options = Options()
-    user_agent = random.choice(USER_AGENTS)
-    options.add_argument(f"user-agent={user_agent}")
-    
-    for option in HEADLESS_OPTIONS:
-        options.add_argument(option)
-        
-    service = Service(ChromeDriverManager().install())
-    options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    
-    driver = webdriver.Chrome(service=service, options=options)
-    driver.set_page_load_timeout(Config.SELENIUM_TIMEOUT)
-    return driver
 
 def click_accept_cookies(driver):
     try:

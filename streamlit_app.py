@@ -73,6 +73,56 @@ st.markdown("""
         background-color: #7B68EE;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
+    
+    /* Custom styling for the tags input */
+    .stTags input {
+        color: #6b4e94 !important;
+    }
+    
+    /* Styling for tags input field placeholder */
+    .stTags input::placeholder {
+        color: white !important;  /* Changed to white */
+        opacity: 0.7;
+    }
+    
+    /* Styling for the label text */
+    .stTags label {
+        color: #6b4e94 !important;
+    }
+    
+    /* Styling for the helper text */
+    .stTags .st-emotion-cache-1y4p8pa {
+        color: #9370DB !important;
+    }
+    
+    /* Navbar styling */
+    .stApp header {
+        background-color: rgba(147, 112, 219, 0.1);
+    }
+    
+    /* Top navbar text color */
+    .stApp header .streamlit-header {
+        color: #6b4e94 !important;
+    }
+    
+    /* Tags input field styling */
+    .stTags {
+        background-color: white !important;
+        border: 2px solid #9370DB !important;
+        border-radius: 4px !important;
+    }
+    
+    /* Footer styling */
+    .footer {
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        text-align: center;
+        color: #6b4e94;
+        margin-top: 50px;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -97,8 +147,9 @@ with left_col:
         value=[],
         suggestions=[],
         maxtags=-1,
-        key='tags_input'
+        key='tags_input',
     )
+    st.caption("Enter each field you want to extract and press enter")
 
 with right_col:
     st.markdown("### 📊 Results")
@@ -153,8 +204,8 @@ with right_col:
                 st.error(f"❌ An error occurred: {str(e)}")
 
 st.markdown(
-    "<p style='text-align: center; color: #6b4e94; padding: 20px;'>"
-    "Made by Priyankesh, <a href='https://github.com/priyankeshh'>Github</a>"
-    "</p>", 
+    "<div class='footer'>"
+    "Made by Priyankesh, <a href='https://github.com/priyankeshh' style='color: #9370DB;'>Github</a>"
+    "</div>", 
     unsafe_allow_html=True
 )
