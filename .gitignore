@@ -16,7 +16,7 @@ ENV/
 output/
 *.json
 *.xlsx
-*.md
+output/*.md  
 scraping_progress.log
 
 # ChromeDriver logs
