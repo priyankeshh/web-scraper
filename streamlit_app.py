@@ -1,6 +1,5 @@
 import streamlit as st
 import os
-import stat
 import platform
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -20,30 +19,8 @@ from datetime import datetime
 from scraper import save_raw_data, format_data, save_formatted_data, calculate_price, html_to_markdown_with_readability, create_dynamic_listing_model, create_listings_container_model
 from assets import PRICING
 
-def set_chromedriver_permissions():
-    """Set appropriate permissions for ChromeDriver based on OS"""
-    if platform.system() == "Windows":
-        driver_path = ChromeDriverManager().install()
-    else:
-        # For Linux deployment
-        os.system('apt-get update && apt-get install -y chromium-browser')
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.binary_location = "/usr/bin/chromium-browser"
-        driver_path = "/usr/bin/chromedriver"
-        
-    try:
-        if platform.system() != "Windows":
-            os.chmod(driver_path, 0o755)
-        return driver_path
-    except Exception as e:
-        st.error(f"❌ Failed to set ChromeDriver permissions: {str(e)}")
-        return None
-
-def fetch_html_selenium(url):
-    """Fetch HTML content using Selenium with proper error handling"""
+def setup_chrome_driver():
+    """Setup ChromeDriver with proper error handling for both local and cloud environments"""
     try:
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless')
@@ -51,36 +28,48 @@ def fetch_html_selenium(url):
         chrome_options.add_argument('--disable-dev-shm-usage')
         
         if platform.system() == "Windows":
-            service = Service(ChromeDriverManager().install())
+            # For local Windows environment
+            try:
+                service = Service(ChromeDriverManager(version="114.0.5735.90").install())
+            except:
+                # Fallback to local ChromeDriver
+                service = Service("chromedriver-win64/chromedriver.exe")
         else:
-            # For Linux deployment
-            chrome_options.binary_location = "/usr/bin/chromium-browser"
-            service = Service("/usr/bin/chromedriver")
+            # For Streamlit cloud (Linux)
+            try:
+                os.system('apt-get update && apt-get install -y chromium-browser chromium-chromedriver')
+                chrome_options.binary_location = "/usr/bin/chromium-browser"
+                service = Service("/usr/lib/chromium/chromedriver")
+            except:
+                # Fallback to webdriver-manager
+                service = Service(ChromeDriverManager().install())
         
         driver = webdriver.Chrome(service=service, options=chrome_options)
+        return driver
+    except Exception as e:
+        st.error(f"❌ ChromeDriver setup error: {str(e)}")
+        return None
+
+def fetch_html_selenium(url):
+    """Fetch HTML content using Selenium with proper error handling"""
+    driver = None
+    try:
+        driver = setup_chrome_driver()
+        if not driver:
+            raise Exception("Failed to initialize ChromeDriver")
+            
         driver.get(url)
         html = driver.page_source
-        driver.quit()
         return html
-        
     except Exception as e:
         st.error(f"❌ Failed to fetch URL: {str(e)}")
         raise Exception(f"Failed to fetch URL: {str(e)}")
-
     finally:
-        try:
-            driver.quit()
-        except:
-            pass
-
-# Add this at the start of your Streamlit app
-try:
-    if set_chromedriver_permissions():
-        st.success("✅ ChromeDriver permissions set successfully")
-    else:
-        st.warning("⚠️ Using alternative ChromeDriver initialization method")
-except Exception as e:
-    st.error(f"❌ ChromeDriver setup error: {str(e)}")
+        if driver:
+            try:
+                driver.quit()
+            except:
+                pass
 
 st.markdown("""
     <style>
@@ -216,7 +205,7 @@ with left_col:
         value=[],
         suggestions=[],
         maxtags=-1,
-        key='tags_input',
+        key='tags_input'
     )
     st.caption("Enter each field you want to extract and press enter")
 
