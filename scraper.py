@@ -23,6 +23,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 
 from openai import OpenAI
 import google.generativeai as genai
@@ -140,7 +141,7 @@ def setup_selenium():
     for option in HEADLESS_OPTIONS:
         options.add_argument(option)
         
-    service = Service(r"./chromedriver-win64/chromedriver.exe")
+    service = Service(ChromeDriverManager().install())
     options.add_experimental_option('excludeSwitches', ['enable-logging'])
     
     driver = webdriver.Chrome(service=service, options=options)
