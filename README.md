@@ -4,7 +4,11 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An intelligent web scraping tool that combines the power of Selenium automation with a user-friendly Streamlit interface. Extract, process, and visualize web data effortlessly.
+A comprehensive web scraping tool that extracts data from websites and provides a user-friendly interface for visualization.
+
+## Project Description
+
+This project is a web scraper that extracts data from websites. It uses Selenium to automate browser interactions, Pandas for data manipulation, and Streamlit for creating an interactive web application to visualize the scraped data. The scraped data is saved in markdown, json, and excel formats.
 
 ## ✨ Features
 
