@@ -21,50 +21,44 @@ from scraper import save_raw_data, format_data, save_formatted_data, calculate_p
 from assets import PRICING
 
 def set_chromedriver_permissions():
-    """Set appropriate permissions for ChromeDriver"""
-    driver_path = "chromedriver-win64/chromedriver.exe"
+    """Set appropriate permissions for ChromeDriver based on OS"""
+    if platform.system() == "Windows":
+        driver_path = "chromedriver-win64/chromedriver.exe"
+    else:
+        driver_path = "chromedriver-linux64/chromedriver"
+        
     try:
+        # Set executable permissions (755 for Linux, full control for Windows)
         if platform.system() == "Windows":
-            # Full control permissions on Windows
             os.chmod(driver_path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
         else:
-            # 755 permissions on Unix-like systems
             os.chmod(driver_path, 0o755)
-        return True
+            
+        return driver_path
     except Exception as e:
-        st.error(f"Failed to set ChromeDriver permissions: {str(e)}")
-        return False
+        st.error(f"❌ Failed to set ChromeDriver permissions: {str(e)}")
+        return None
 
 def fetch_html_selenium(url):
     """Fetch HTML content using Selenium with proper error handling"""
     try:
-        # Setup Chrome options
+        driver_path = set_chromedriver_permissions()
+        if not driver_path:
+            raise Exception("Failed to configure ChromeDriver")
+            
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         
-        # Try multiple methods to initialize ChromeDriver
-        try:
-            # First attempt: Use local ChromeDriver with permissions fix
-            if not set_chromedriver_permissions():
-                raise Exception("Failed to set ChromeDriver permissions")
-            
-            service = Service('chromedriver-win64/chromedriver.exe')
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-            
-        except WebDriverException:
-            # Second attempt: Use webdriver_manager
-            st.warning("⚠️ Falling back to webdriver_manager...")
-            service = Service(ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-
-        # Fetch page content
+        service = Service(driver_path)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        
         driver.get(url)
         html = driver.page_source
         driver.quit()
         return html
-
+        
     except Exception as e:
         st.error(f"❌ Failed to fetch URL: {str(e)}")
         raise Exception(f"Failed to fetch URL: {str(e)}")
